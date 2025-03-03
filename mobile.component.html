@@ -1,0 +1,175 @@
+
+<div class="main-div">
+
+    <div class="title">Sudoku {{selectedSample+1}}</div>
+
+    <!-- TABLE DIV -->
+    <div>
+        <!-- PENDING COLUMNS -->
+        <div class="row">
+            <div class="cell-struct"></div>
+            <div *ngFor="let _ of table; let iColumn = index" class="cell-struct">
+                <div class="pending-cell">{{pending.column[iColumn]}}</div>
+            </div>
+        </div>
+
+        <div *ngFor="let _ of table; let iRow = index" class="row">
+
+            <!-- PENDING ROWS -->
+            <div class="cell-struct">
+                <div class="pending-cell">{{pending.row[iRow]}}</div>
+            </div>
+            <div *ngFor="let _ of table[iRow]; let iColumn = index" class="row">
+                
+                <div class="column">
+
+                    <!-- CELLS -->
+                    <div class="cell-struct" (click)="clickCell(iRow, iColumn)">
+                        <div class="cell" [ngClass]="{
+                            'value0': table[iRow][iColumn].value == 0,
+                            'value1': table[iRow][iColumn].value == 1,
+                            'value2': table[iRow][iColumn].value == 2,
+                            'value3': table[iRow][iColumn].value == 3,
+                            'value4': table[iRow][iColumn].value == 4,
+                            'value5': table[iRow][iColumn].value == 5,
+                            'value6': table[iRow][iColumn].value == 6,
+                            'value7': table[iRow][iColumn].value == 7,
+                            'value8': table[iRow][iColumn].value == 8,
+                            'value9': table[iRow][iColumn].value == 9
+                        }">{{table[iRow][iColumn].value}}</div>
+                        
+                        <div *ngIf="table[iRow][iColumn].value == 0" class="option-cell">
+                            <div *ngFor="let _ of options; let optionsRow = index" class="row">
+                                <div *ngFor="let _ of options; let optionsColumn = index">
+                                    <div class="option-div">
+                                        <div class="option" [ngClass]="{
+                                            'value1': table[iRow][iColumn].options[1] == true && options[optionsRow][optionsColumn] == 1,
+                                            'value2': table[iRow][iColumn].options[2] == true && options[optionsRow][optionsColumn] == 2,
+                                            'value3': table[iRow][iColumn].options[3] == true && options[optionsRow][optionsColumn] == 3,
+                                            'value4': table[iRow][iColumn].options[4] == true && options[optionsRow][optionsColumn] == 4,
+                                            'value5': table[iRow][iColumn].options[5] == true && options[optionsRow][optionsColumn] == 5,
+                                            'value6': table[iRow][iColumn].options[6] == true && options[optionsRow][optionsColumn] == 6,
+                                            'value7': table[iRow][iColumn].options[7] == true && options[optionsRow][optionsColumn] == 7,
+                                            'value8': table[iRow][iColumn].options[8] == true && options[optionsRow][optionsColumn] == 8,
+                                            'value9': table[iRow][iColumn].options[9] == true && options[optionsRow][optionsColumn] == 9,
+                                            'hidden': table[iRow][iColumn].options[options[optionsRow][optionsColumn]] == undefined,
+                                            'option-top-left': optionsRow == 0 && optionsColumn == 0,
+                                            'option-top-right': optionsRow == 0 && optionsColumn == blockSize-1,
+                                            'option-bottom-right': optionsRow == blockSize-1 && optionsColumn == 0,
+                                            'option-bottom-left': optionsRow == blockSize-1 && optionsColumn == blockSize-1
+                                        }">{{options[optionsRow][optionsColumn]}}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div> 
+                        
+                        <div class="cell-border" [ngClass]="{
+                            'selected-cell': selectedRow == iRow && selectedColumn == iColumn,
+                            'selected-neighbour': !(selectedRow == iRow && selectedColumn == iColumn) && (selectedRow == iRow || selectedColumn == iColumn || selectedBlock == table[iRow][iColumn].block),
+                            'selected-value': selectedValue == table[iRow][iColumn].value
+                        }"></div>
+                    </div>
+
+                    <div *ngIf="(iRow + 1) % 3 == 0 && (iRow + 1) != table.length" class="horizontal-line"></div>
+                </div>
+
+                <div *ngIf="(iColumn + 1) % 3 == 0 && (iColumn + 1) != table.length" class="vertical-line"></div>
+            </div>
+        </div>
+
+        <div class="row-separator"></div>
+
+        <!-- PICK -->
+        <div class="row">
+            <div class="cell-struct"></div>
+            <div *ngFor="let _ of table; let i = index" class="cell-struct" (click)="clickPick(i+1)"> 
+                <div class="pick-cell" [ngClass]="{
+                    'value1': i+1 == 1,
+                    'value2': i+1 == 2,
+                    'value3': i+1 == 3,
+                    'value4': i+1 == 4,
+                    'value5': i+1 == 5,
+                    'value6': i+1 == 6,
+                    'value7': i+1 == 7,
+                    'value8': i+1 == 8,
+                    'value9': i+1 == 9
+                }">{{i+1}}</div>
+
+                <div class="cell-border" [ngClass]="{
+                    'selected-pick': selectedPick == i+1
+                }"></div>
+            </div>
+        </div>
+
+        <!-- PENDING PICKS -->
+        <div class="row">
+            <div class="cell-struct"></div>
+            <div *ngFor="let _ of table; let i = index" class="cell-struct"> 
+                <div class="pending-cell">{{pending.pick[i]}}</div>
+            </div>
+        </div>
+
+        <div class="row-separator"></div>
+
+        <div class="bottom-div">
+            <div>
+                <div *ngFor="let _ of pending.block; let iRow = index" class="row">
+                    <div *ngFor="let _ of pending.block[iRow]; let iColumn = index" class="column">
+                        <div class="pending-block-struct">
+                            <div class="pending-cell">{{pending.block[iRow][iColumn]}}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    
+            <div [style.margin-left]="'3rem'" [style.margin-bottom]="'4rem'">
+                <div *ngFor="let _ of pending.block; let iRow = index" class="row">
+                    <div *ngFor="let _ of pending.block[iRow]; let iColumn = index" class="column">
+                        <div class="cell-struct">
+                            <div class="option-cell value0">
+                                <div *ngFor="let _ of options; let optionsRow = index" class="row">
+                                    <div *ngFor="let _ of options; let optionsColumn = index">
+                                        <div class="option-div">
+                                            <div class="option" [ngClass]="{
+                                                'value1': options[iRow][iColumn] == 1,
+                                                'value2': options[iRow][iColumn] == 2,
+                                                'value3': options[iRow][iColumn] == 3,
+                                                'value4': options[iRow][iColumn] == 4,
+                                                'value5': options[iRow][iColumn] == 5,
+                                                'value6': options[iRow][iColumn] == 6,
+                                                'value7': options[iRow][iColumn] == 7,
+                                                'value8': options[iRow][iColumn] == 8,
+                                                'value9': options[iRow][iColumn] == 9,
+                                                'hidden': options[optionsRow][optionsColumn] != options[iRow][iColumn],
+                                                'option-top-left': optionsRow == 0 && optionsColumn == 0,
+                                                'option-top-right': optionsRow == 0 && optionsColumn == blockSize-1,
+                                                'option-bottom-right': optionsRow == blockSize-1 && optionsColumn == 0,
+                                                'option-bottom-left': optionsRow == blockSize-1 && optionsColumn == blockSize-1
+                                            }" (click)="clickOption(options[iRow][iColumn])">{{options[optionsRow][optionsColumn]}}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+<div class="sign">Para: <strong>Begoña Oyarzabal 👸🏻</strong></div>
+
+<div *ngIf="solution != ''" class="message-div">
+
+    <div class="message">Solución:</div>
+    <div *ngIf="solution == 'correct'" class="message">Correcta</div>
+    <div *ngIf="solution == 'incorrect'" class="message">Incorrecta</div>
+
+    <div class="row-separator"></div>
+    
+    <div *ngIf="solution == 'incorrect'" class="button" (click)="solutionMessageReturn()">Volver</div>
+    <div *ngIf="solution == 'incorrect'" class="button" (click)="solutionMessageRestart()">Reiniciar</div>
+    <div class="button" (click)="solutionMessageNew()">Nuevo Sudoku</div>
+
+</div>
